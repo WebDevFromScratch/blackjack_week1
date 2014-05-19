@@ -18,7 +18,10 @@ end
 
 # defining methods
 def deal_card(hand, some_deck)
-  hand << some_deck.pop
+  new_card = some_deck.pop
+  hand << new_card
+  puts ""
+  puts "Dealing card: #{new_card}"
 end
 
 def calculate_value(hand)
@@ -46,19 +49,26 @@ end
 def determine_winner(hand1, hand2, some_deck)
   hand1_value = calculate_value(hand1)
   hand2_value = calculate_value(hand2)
+  #player's turn
   if hand1_value > 21
     puts "Your hand value is #{hand1_value}. You're busted!"
+    exit
   elsif hand1_value == 21
     puts "You hit blackjack. You win!"
+    exit
   else
     #check if an Ace is in player's hand
     if is_ace(hand1)
-      if hand1_value + 10 <= 21
+      if hand1_value + 10 == 21
+        puts "You hit blackjack. You win!"
+        exit
+      elsif hand1_value + 10 < 21
         hand1_value = calculate_value(hand1) + 10
       end
     end
     puts "Your hand value is #{hand1_value}. Enter 'h' to hit or 's' to stand."
     action = gets.chomp
+    #action's based on player's choice
     if action == 'h'
       deal_card(hand1, some_deck)
       puts ""
@@ -67,7 +77,7 @@ def determine_winner(hand1, hand2, some_deck)
     elsif action == 's'
       puts ""
       puts "Your final hand value is #{hand1_value}."
-      # actions for the dealer, then compare values and determine the winner
+      # dealer's turn
       # check if an Ace is in dealer's hand
       if is_ace(hand2)
         if hand2_value + 10 <= 21
@@ -78,24 +88,35 @@ def determine_winner(hand1, hand2, some_deck)
       while hand2_value < 17
         deal_card(hand2, some_deck)
         hand2_value = calculate_value(hand2)
+        #ace case again
+        if is_ace(hand2)
+          if hand2_value + 10 <= 21
+            hand2_value = calculate_value(hand2) + 10
+          end
+        end
       end
-      puts ""
-      puts "Your final hand is: #{hand1}."
-      puts "Dealer's final hand is: #{hand2}."
       puts ""
       if hand2_value > 21
         puts "Dealer is busted (#{hand2_value}). You win!"
-      #compare and determine the winner
+      elsif hand2_value == 21
+        puts "Dealer hit blackjack. Dealer wins!"
       else
+        puts "Your final hand is: #{hand1}."
+        puts "Dealer's final hand is: #{hand2}."
+        puts ""      
+        #compare and determine the winner
         puts  "Your hand value is #{hand1_value}, Dealer's hand value is #{hand2_value}."
-        if hand1_value > hand2_value
+        if hand1_value > hand2_value #dealer wins ties in my version
           puts "You win!"
         else
           puts "Dealer wins!"
         end
       end
+    #if other key used (invalid action case)
     else
       puts "#{action} is not a valid action"
+      puts ""
+      determine_winner(hand1, hand2, some_deck)
     end
   end
 end
@@ -112,11 +133,10 @@ puts "Let's play some Blackjack!", ""
 player_hand = []
 dealer_hand = []
 
-deal_card(player_hand, deck)
-deal_card(player_hand, deck)
-
-deal_card(dealer_hand, deck)
-deal_card(dealer_hand, deck)
+player_hand << deck.pop
+dealer_hand << deck.pop
+player_hand << deck.pop
+dealer_hand << deck.pop
 
 player_hand_value = calculate_value(player_hand)
 dealer_hand_value = calculate_value(dealer_hand)
